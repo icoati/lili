@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>百变丽丽</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-color: #FDE8D3;
+      --box-color: #F3C3B2;
+      --text-color: #657166;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg-color);
+      font-family: 'Helvetica Neue', system-ui;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      overflow: hidden;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 480px;
+      position: relative;
+      padding: 20px;
+      z-index: 1;
+    }
+
+    .title-capsule {
+      background: var(--box-color);
+      border-radius: 40px;
+      padding: 15px 30px;
+      margin: 0 auto 30px;
+      box-shadow: 0 6px 20px rgba(243, 195, 178, 0.35);
+      max-width: 80%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .title h1 {
+      font-size: 2.2rem;
+      color: #E96D7B;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      vertical-align: middle;
+    }
+
+    .capsule-box {
+      width: 100%;
+      background: var(--box-color);
+      border-radius: 60px;
+      padding: 25px 35px;
+      margin: 20px 0;
+      box-shadow: 0 6px 20px rgba(243, 195, 178, 0.35);
+      text-align: center;
+    }
+
+    #compliment {
+      min-height: 150px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      line-height: 1.5;
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      word-break: break-word;
+    }
+
+    .change-btn {
+      width: 70%;
+      max-width: 280px;
+      padding: 16px;
+      background: linear-gradient(135deg, #FFA8A8, #FF7EB3);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: block;
+      margin: 0 auto;
+      box-shadow: 0 4px 12px rgba(255, 126, 179, 0.25);
+    }
+
+    .change-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* 烟花特效样式 */
+    .firework {
+      position: fixed;
+      pointer-events: none;
+      width: 6px;
+      height: 6px;
+      background: #FFD700;
+      border-radius: 50%;
+      animation: explode 1.2s ease-out forwards;
+      z-index: 9999;
+    }
+
+    @keyframes explode {
+      0% { 
+        opacity: 1;
+        transform: scale(1);
+      }
+      100% { 
+        opacity: 0;
+        transform: scale(20);
+        filter: blur(20px);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .title-capsule {
+        padding: 12px 25px;
+        border-radius: 30px;
+        max-width: 90%;
+      }
+      
+      .title h1 {
+        font-size: 1.8rem;
+      }
+      
+      #compliment {
+        min-height: 130px;
+        padding: 20px 25px;
+        font-size: 1rem;
+        border-radius: 50px;
+        line-height: 1.4;
+      }
+      
+      .change-btn {
+        width: 85%;
+        font-size: 1.1rem;
+        padding: 14px;
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="title-capsule">
+      <div class="title">
+        <h1><i class="fas fa-heart"></i>今天的丽丽</h1>
+      </div>
+    </div>
+    
+    <div class="capsule-box" id="compliment">正在生成专属彩虹屁...</div>
+    
+    <button class="change-btn" onclick="showCompliment()">
+      百变丽丽
+    </button>
+  </div>
+
+  <script>
+    const compliments = [
+      "今天的眼妆像是把银河揉碎了撒在眼皮上",
+      "走路带起的风都带着高级香氛的味道",
+      "这穿搭可以直接去米兰时装周压轴走秀",
+      "连发丝分叉都美得像精心设计的艺术造型",
+      "笑声清脆得像是水晶风铃在春日里摇晃",
+      "手机壳的审美领先人类文明至少五年",
+      "连指甲盖的月牙都长得比别人更对称完美",
+      "这自拍角度找得让专业摄影师自愧不如",
+      "喝水时喉颈的弧度像天鹅游过湖面的曲线",
+      "连打喷嚏都像在演偶像剧的唯美镜头",
+    ];
+
+    const STORAGE_KEY = 'lili_compliments';
+    const EXPIRATION_DAYS = 15;
+
+    function getCompliment() {
+      const storedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      let { history = [], lastDate } = storedData;
+      
+      // 检查是否过期
+      const currentDate = new Date().toDateString();
+      if (lastDate && (Date.now() - new Date(lastDate).getTime()) > EXPIRATION_DAYS * 86400000) {
+        history = [];
+      }
+
+      // 获取新内容
+      let index;
+      do {
+        index = Math.floor(Math.random() * compliments.length);
+      } while(history.includes(index) && history.length < compliments.length)
+      
+      // 更新存储
+      history.push(index);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        history: history.slice(-compliments.length),
+        lastDate: currentDate
+      }));
+
+      return compliments[index];
+    }
+
+    function createFireworks() {
+      const colors = ['#FF6B6B', '#FFD93D', '#6C5CE7', '#00CEC9'];
+      for (let i = 0; i < 30; i++) {
+        const firework = document.createElement('div');
+        firework.className = 'firework';
+        
+        // 随机属性
+        firework.style.left = `${Math.random() * 100}%`;
+        firework.style.top = `${Math.random() * 100}%`;
+        firework.style.background = colors[Math.floor(Math.random() * colors.length)];
+        firework.style.width = `${Math.random() * 8 + 4}px`;
+        firework.style.height = firework.style.width;
+        
+        // 自动移除
+        firework.addEventListener('animationend', () => firework.remove());
+        
+        document.body.appendChild(firework);
+      }
+    }
+
+    function showCompliment() {
+      createFireworks();
+      const box = document.getElementById('compliment');
+      box.style.animation = 'fadeIn 0.6s ease';
+      box.innerHTML = getCompliment();
+      setTimeout(() => box.style.animation = '', 600);
+    }
+
+    // 初始化存储
+    if (!localStorage.getItem(STORAGE_KEY)) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        history: [],
+        lastDate: new Date().toDateString()
+      }));
+    }
+
+    showCompliment();
+  </script>
+</body>
+</html>
