@@ -96,7 +96,7 @@
         </button>
     </div>
 
-    <audio id="backgroundMusic" src="music.mp3" autoplay loop muted></audio>
+    <audio id="backgroundMusic" autoplay loop muted></audio>
     <button id="musicControlBtn"><i class="fa-solid fa-music"></i></button>
 
     <script>
@@ -104,18 +104,47 @@
         const musicControlBtn = document.getElementById('musicControlBtn');
         const musicIcon = musicControlBtn.querySelector('i');
 
-        // 尝试在页面加载完成后解除静音播放
-        window.onload = () => {
-            document.getElementById('generateBtn').click();
-            audio.muted = false;
+        // 音乐列表
+        const musicList = [
+            "music.mp3",
+            "music2.mp3",
+            "music3.mp3",
+            "music4.mp3",
+            "music5.mp3",
+            "music6.mp3",
+            "music7.mp3",
+            "music8.mp3",
+            "music9.mp3",
+            // 可添加更多音乐链接
+        ];
+
+        // 随机选择一首音乐
+        function selectRandomMusic() {
+            const randomIndex = Math.floor(Math.random() * musicList.length);
+            return musicList[randomIndex];
+        }
+
+        // 播放随机音乐
+        function playRandomMusic() {
+            const randomMusic = selectRandomMusic();
+            audio.src = randomMusic;
             audio.play().catch(() => {
                 // 如果自动播放被阻止，等待用户交互
                 document.addEventListener('click', () => {
-                    audio.muted = false;
                     audio.play();
                 }, { once: true });
             });
+        }
+
+        // 页面加载时播放随机音乐
+        window.onload = () => {
+            document.getElementById('generateBtn').click();
+            audio.muted = false;
+            playRandomMusic();
         };
+
+        // 监听音乐结束事件，播放下一首随机音乐
+        audio.addEventListener('ended', playRandomMusic);
 
         musicControlBtn.addEventListener('click', () => {
             if (audio.paused) {
