@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -65,24 +66,33 @@
             animation: rotate 10s linear infinite;
         }
 
-        #musicControlBtn {
+        /* 紧凑的音乐播放器样式 */
+        #musicPlayer {
             position: absolute;
             top: 1rem;
             right: 1rem;
             background-color: rgba(255, 255, 255, 0.3);
             border: none;
-            border-radius: 0.5rem;
-            padding: 0.5rem 0.75rem;
+            border-radius: 25px;
+            padding: 0.25rem 0.5rem; /* 减少内边距 */
             cursor: pointer;
             transition: background-color 0.3s ease;
-            font-size: 1.25rem;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 120px; /* 减小宽度 */
         }
 
-        #musicControlBtn:hover {
+        #musicPlayer i {
+            font-size: 1rem; /* 缩小图标大小 */
+        }
+
+        #musicPlayer:hover {
             background-color: rgba(255, 255, 255, 0.5);
         }
     </style>
 </head>
+
 <body class="min-h-screen flex justify-center items-center relative">
     <div class="text-center p-8 bg-white/20 rounded-2xl shadow-xl shadow-black/20 w-9/10 max-w-2xl relative z-10 backdrop-blur-md">
         <h1 class="text-4xl text-pink-900 mb-4 text-shadow-md">
@@ -97,12 +107,17 @@
     </div>
 
     <audio id="backgroundMusic" autoplay loop muted></audio>
-    <button id="musicControlBtn"><i class="fa-solid fa-music"></i></button>
+    <div id="musicPlayer">
+        <i id="prevBtn" class="fa-solid fa-backward-step"></i>
+        <i id="playPauseBtn" class="fa-solid fa-play"></i>
+        <i id="nextBtn" class="fa-solid fa-forward-step"></i>
+    </div>
 
     <script>
         const audio = document.getElementById('backgroundMusic');
-        const musicControlBtn = document.getElementById('musicControlBtn');
-        const musicIcon = musicControlBtn.querySelector('i');
+        const prevBtn = document.getElementById('prevBtn');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const nextBtn = document.getElementById('nextBtn');
 
         // 音乐列表
         const musicList = [
@@ -117,6 +132,7 @@
             "music9.mp3",
             // 可添加更多音乐链接
         ];
+        let currentMusicIndex = 0;
 
         // 随机选择一首音乐
         function selectRandomMusic() {
@@ -146,16 +162,31 @@
         // 监听音乐结束事件，播放下一首随机音乐
         audio.addEventListener('ended', playRandomMusic);
 
-        musicControlBtn.addEventListener('click', () => {
+        // 上一首
+        prevBtn.addEventListener('click', () => {
+            currentMusicIndex = (currentMusicIndex - 1 + musicList.length) % musicList.length;
+            audio.src = musicList[currentMusicIndex];
+            audio.play();
+        });
+
+        // 暂停/播放
+        playPauseBtn.addEventListener('click', () => {
             if (audio.paused) {
                 audio.play();
-                musicIcon.classList.remove('fa-music-slash');
-                musicIcon.classList.add('fa-music');
+                playPauseBtn.classList.remove('fa-play');
+                playPauseBtn.classList.add('fa-pause');
             } else {
                 audio.pause();
-                musicIcon.classList.remove('fa-music');
-                musicIcon.classList.add('fa-music-slash');
+                playPauseBtn.classList.remove('fa-pause');
+                playPauseBtn.classList.add('fa-play');
             }
+        });
+
+        // 下一首
+        nextBtn.addEventListener('click', () => {
+            currentMusicIndex = (currentMusicIndex + 1) % musicList.length;
+            audio.src = musicList[currentMusicIndex];
+            audio.play();
         });
 
         const complimentList = [
@@ -396,5 +427,5 @@
         }
     </script>
 </body>
+
 </html>
-    
